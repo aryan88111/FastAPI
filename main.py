@@ -1,6 +1,7 @@
 from typing import Optional
-from pydantic import BaseModel
-from fastapi import FastAPI
+from pydantic import BaseModel # pyright: ignore[reportMissingImports]
+from fastapi import FastAPI # pyright: ignore[reportMissingImports]
+import uvicorn # pyright: ignore[reportMissingImports]
  
 app=FastAPI()
 
@@ -67,4 +68,11 @@ class Blog(BaseModel):
 def create_blog(req:Blog):
 
     return {"data":f"Blog is created with title as {req.title}"}
+        
+        
+        
+# if __name__=="__main__":
+#     uvicorn.run(app,host="0.0.0.0",port=9000)
+    
+    
         
