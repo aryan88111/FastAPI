@@ -73,6 +73,7 @@
 
 
 
+import re
 import fitz  # PyMuPDF
 import os
 import pdfplumber
@@ -80,20 +81,20 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
-# ✅ Correct PDF file path
-PDF_PATH = "/Users/aryangautam/Desktop/work/FastApi-python/blog/p2.pdf"
+# Correct PDF file path
+PDF_PATH = "/Users/aryangautam/Desktop/work/FastApi-python/blog/p4.pdf"
 
-# ✅ Open with PyMuPDF (for image extraction only)
+# Open with PyMuPDF (for image extraction only)
 inputPdf = fitz.open(PDF_PATH)
 
-# ✅ Create folder for saving extracted images
+#  Create folder for saving extracted images
 os.makedirs("extracted_images", exist_ok=True)
 
-# ✅ Global cache (not recommended for production, but fine for testing)
+#  Global cache (not recommended for production, but fine for testing)
 listt = []
 imageList = []
 
-# ✅ Route 1: Extract text + images using PyMuPDF
+# Route 1: Extract text + images using PyMuPDF
 @app.get("/")
 def parse_pdf():
     # Clear previous data on re-call
@@ -127,7 +128,7 @@ def parse_pdf():
     
     
 
-# ✅ Route 2: Extract text + tables using pdfplumber
+# Route 2: Extract text + tables using pdfplumber
 @app.get("/text-table")
 def parse_pdf_table():
     text_list = []
@@ -164,7 +165,7 @@ def parse_pdf_table():
 #             for line in text_lines:
 #                 # Line ke characters dekhne ke liye phir se chars ka use
 #                 for char in page.chars:
-#                     if char["text"] in line and float(char["size"]) >= 16:
+#                     if char["text"] in line and float(char["size"]) > 16:
 #                         headings.append({
 #                             "text": line.strip(),
 #                             "page": page_num,
@@ -175,7 +176,71 @@ def parse_pdf_table():
 #     return {"headings": headings}
 
 
+@app.get("/get-headings")
+def get_headings():
+    headings = []
+
+    with pdfplumber.open(PDF_PATH) as pdf:
+        for page_num, page in enumerate(pdf.pages, start=1):
+            text = page.extract_text()
+            if not text:
+                continue
+
+            lines = text.split("\n")
+            for line in lines: 
+                line = line.strip()
+                if not line or len(line) < 3:
+                    continue
+
+                # Simple heading rules
+                if (
+                    re.match(r"^(Chapter|Section)?\s?\d+(\.\d+)?", line, re.IGNORECASE) or  # e.g., Section 1.2
+                    (line.isupper() and len(line.split()) <= 6) or                         # ALL CAPS short lines
+                    (line.istitle() and len(line.split()) <= 6)                            # Title Case short lines
+                ):
+                    headings.append({
+                        "text": line,
+                        "page": page_num
+                    })
+
+    return {"headings": headings}
 
 
 
+#    AIzaSyCmLdOuhJhcmMJiVhgTt4ITmGE1oN15MPE 
+#  gemini api key
 
+# import google.generativeai as genai
+# from pydantic import BaseModel
+
+# os.environ["GOOGLE_API_KEY"] = "AIzaSyCmLdOuhJhcmMJiVhgTt4ITmGE1oN15MPE"
+# genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
+
+
+# def extract_pdf_text(pdf_path: str) -> str:
+#     full_text = ""
+#     with pdfplumber.open(pdf_path) as pdf:
+#         for i, page in enumerate(pdf.pages, start=1):
+#             text = page.extract_text()
+#             if text:
+#                 full_text += f"\n\n--- Page {i} ---\n{text}"
+#     return full_text
+
+# # ======== GEMINI CALL FUNCTION ========
+# def ask_gemini_about_pdf(pdf_text: str, question: str) -> str:
+#     model = genai.GenerativeModel(model_name="models/gemini-2.5-pro")
+
+#     prompt = f"{pdf_text}\n\nNow answer this:\n{question}"
+#     response = model.generate_content(prompt)
+    
+#     return response.text
+
+# # ======== REQUEST MODEL ========
+# class PDFQuery(BaseModel):
+#     question: str
+
+# @app.post("/pdf-query")
+# def query_pdf(data: PDFQuery):
+#     pdf_text = extract_pdf_text(PDF_PATH)
+#     answer = ask_gemini_about_pdf(pdf_text, data.question)
+#     return {"question": data.question, "answer": answer}
