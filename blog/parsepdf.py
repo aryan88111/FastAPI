@@ -82,7 +82,7 @@ from fastapi import FastAPI
 app = FastAPI()
 
 # Correct PDF file path
-PDF_PATH = "/Users/aryangautam/Desktop/work/FastApi-python/blog/p4.pdf"
+PDF_PATH = "/Users/aryangautam/Desktop/work/FastApi-python/blog/p2.pdf"
 
 # Open with PyMuPDF (for image extraction only)
 inputPdf = fitz.open(PDF_PATH)
@@ -211,7 +211,7 @@ def get_headings():
 # import google.generativeai as genai
 # from pydantic import BaseModel
 
-# os.environ["GOOGLE_API_KEY"] = "GOOGLE_API_KEY"
+# os.environ["GOOGLE_API_KEY"] = "AIzaSyCmLdOuhJhcmMJiVhgTt4ITmGE1oN15MPE "
 # genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 
 
@@ -239,6 +239,6 @@ def get_headings():
 
 # @app.post("/pdf-query")
 # def query_pdf(data: PDFQuery):
-#     pdf_text = extract_pdf_text(PDF_PATH)
-#     answer = ask_gemini_about_pdf(pdf_text, data.question)
-#     return {"question": data.question, "answer": answer}
+    pdf_text = extract_pdf_text(PDF_PATH)
+    answer = ask_gemini_about_pdf(pdf_text, data.question)
+    return {"question": data.question, "answer": answer}
