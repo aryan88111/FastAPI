@@ -211,7 +211,7 @@ def get_headings():
 # import google.generativeai as genai
 # from pydantic import BaseModel
 
-# os.environ["GOOGLE_API_KEY"] = "AIzaSyCmLdOuhJhcmMJiVhgTt4ITmGE1oN15MPE "
+# os.environ["GOOGLE_API_KEY"] = " "
 # genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 
 
